@@ -2,30 +2,32 @@
 header("Content-Type:text/html; charset=utf-8");
 class Account
 {
-    protected $DB;
+    public $db;
+    
     public function __construct()
     {
-        $DBCONNECT = "mysql:host=localhost;dbname=payment;port=443";
-        $DBUSER = "root";
-        $DBPW = "";
+        $dbconnect = "mysql:host=localhost;dbname=payment;port=443";
+        $dbuser = "root";
+        $dbpw = "";
         // 連接資料庫伺服器
-        $this->DB = new PDO($DBCONNECT, $DBUSER, $DBPW);
-        $this->DB->exec("set names utf8");
+        $this->db = new PDO($dbconnect, $dbuser, $dbpw);
+        $this->db->exec("set names utf8");
     }
-    function __destruct()
+    
+    public function __destruct()
     {
-        $this->DB = NULL;
+        $this->db = NULL;
     }
-    public function check_account($ACCOUNT)
+    
+    public function checkAccount($account)
     {
-        $RESULT =  $this->DB->prepare("SELECT * FROM `account` WHERE `account` = ?");
-        $RESULT->execute(array($ACCOUNT));//依序取代sql中"?"的值，並執行
-        $ROW = $RESULT->fetchAll();
-        if(count($ROW)<1){
+        $result = $this->db->prepare("SELECT * FROM `account` WHERE `account` = ?");
+        $result->execute(array($account));//依序取代sql中"?"的值，並執行
+        $row = $result->fetchAll();
+        if (count($row)<1) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
 }
-?>

@@ -5,10 +5,10 @@
             function check()
             {
                 $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
-                var ACCOUNT = $("#account").val();
-                var MONEY = $("#money").val();
+                var account = $("#account").val();
+                var money = $("#money").val();
                 /* type: 1 = 出款 2 = 入款 */
-                $.get("../PaymentFlow/Money?type=1&account="+ACCOUNT+"&money="+MONEY,res)
+                $.get("../PaymentFlow/money?type=1&account="+account+"&money="+money,res)
             }
             function res(data)
             {

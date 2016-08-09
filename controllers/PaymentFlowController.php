@@ -1,58 +1,71 @@
 <?php
-class PaymentFlowController extends Controller {
-    function checkAccount($ACCOUNT)
+class PaymentFlowController extends Controller
+{
+    public function checkAccount($account)
     {
-        $CHECK = $this->model("Account");
-        $CHECK_ACCOUNT = $CHECK->check_account($ACCOUNT);
-        return $CHECK_ACCOUNT;
+        $check = $this->model("Account");
+        $checkAccount = $check->checkAccount($account);
+        return $checkAccount;
     }
-    function Money()
+    
+    public function money()
     {   
-        $TYPE = $_GET['type'];
-        $ACCOUNT = $_GET['account'];
-        $MONEY = $_GET['money'];
+        $type = $_GET['type'];
+        $account = $_GET['account'];
+        $money = $_GET['money'];
         /* 先確認是否有此帳號 */
-        $CHECK_ACCOUNT = $this->checkAccount($ACCOUNT);
-        if($CHECK_ACCOUNT){
-            $PAYMENTFLOW = $this->model("PaymentFlow");
-            if($TYPE == 1){
-                $RESULT = $PAYMENTFLOW->paymentFlowPayMoney($ACCOUNT,$MONEY);
-                if($RESULT){
-                    $SHOW_INFO = "交易完成，已成功付出款項";    
-                }else{
-                    $SHOW_INFO = "交易失敗，請在試一次";
+        $checkAccount = $this->checkAccount($account);
+        if ($checkAccount) {
+            try {
+                $paymentFlow = $this->model("PaymentFlow");
+                $paymentFlow->db->beginTransaction();
+                // sleep(5);
+                /* 執行 row lock */
+                $paymentFlow->checkBalance($account);
+                // sleep(10);
+                if ($type == 1) {
+                    $result = $paymentFlow->paymentFlowPayMoney($account,$money);
+                    if ($result) {
+                        $showInfo = "交易完成，已成功付出款項";    
+                    } else {
+                        $showInfo = "交易失敗，請在試一次";
+                        throw new Exception($showInfo);
+                    }
+                } else {
+                    $result = $paymentFlow->paymentFlowEearnMoney($account,$money);
+                    if ($result) {
+                        $showInfo = "交易完成，已成功存入戶頭";    
+                    } else {
+                        $showInfo = "交易失敗，請在試一次";
+                        throw new Exception($showInfo);
+                    }
                 }
-            }else{
-                $RESULT = $PAYMENTFLOW->paymentFlowEearnMoney($ACCOUNT,$MONEY);
-                if($RESULT){
-                    $SHOW_INFO = "交易完成，已成功存入戶頭";    
-                }else{
-                    $SHOW_INFO = "交易失敗，請在試一次";
-                }
+                $paymentFlow->db->commit();
+            } catch(Exception $showInfo) {
+                $paymentFlow->db->rollback();
+                $this->view("showinformation",$showInfo-＞getMessage());
             }
-        }else{
-            $SHOW_INFO = "帳號輸入錯誤";
+           
+            
+        } else {
+            $showInfo = "帳號輸入錯誤";
         }
-        $this->view("showinformation",$SHOW_INFO);
+        $this->view("showinformation",$showInfo);
     }
-    function ShowPayMent()
+    
+    public function showPayMent()
     {   
-        $ACCOUNT = $_GET['account'];
+        $account = $_GET['account'];
         /* 先確認是否有此帳號 */
-        $CHECK_ACCOUNT = $this->checkAccount($ACCOUNT);
-        if($CHECK_ACCOUNT){
-            $PAYMENTFLOW = $this->model("PaymentFlow");
-            $RESULT_BALANCE = $PAYMENTFLOW->AccountBalance($ACCOUNT);
-            $RESULT_ALL = $PAYMENTFLOW->AccountShowPayMent($ACCOUNT);
-            $this->view("balance",$RESULT_BALANCE,$RESULT_ALL);
-            $SHOW_INOF = "帳號輸入正確";
-        }else{
-            $SHOW_INFO = "帳號輸入錯誤";
-            $this->view("showinformation",$SHOW_INFO);
+        $checkAccount = $this->checkAccount($account);
+        if ($checkAccount) {
+            $paymentFlow = $this->model("PaymentFlow");
+            $resultBalance = $paymentFlow->accountBalance($account);
+            $resultAll = $paymentFlow->accountShowPayMent($account);
+            $this->view("balance",$resultBalance,$resultAll);
+        } else {
+            $showInfo = "帳號輸入錯誤";
+            $this->view("showinformation",$showInfo);
         }
-        // echo "123";
-        // $SHOW_INFO = "yio";
-        // $this->view("showinformation",$SHOW_INFO);
     }
 }
-?>

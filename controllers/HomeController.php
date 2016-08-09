@@ -5,11 +5,13 @@ class HomeController extends Controller {
     {
         $this->view("index");
     }
+    
     /* 跳轉到 出款(payMoney.php) 頁面 */
     function payMoney()
     {
         $this->view("payMoney");
     }
+    
     /* 跳轉到 入款(earnMoney.php) 頁面 */
     function earnMoney()
     {

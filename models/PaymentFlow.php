@@ -1,65 +1,75 @@
 <?php
 header("Content-Type:text/html; charset=utf-8");
+date_default_timezone_set('Asia/Taipei');
 class PaymentFlow
 {
-    protected $DB;
+    public $db;
+    
     public function __construct()
     {
-        $DBCONNECT = "mysql:host=localhost;dbname=payment;port=443";
-        $DBUSER = "root";
-        $DBPW = "";
+        $dbconnect = "mysql:host=localhost;dbname=payment;port=443";
+        $dbuser = "root";
+        $dbpw = "";
         // 連接資料庫伺服器
-        $this->DB = new PDO($DBCONNECT, $DBUSER, $DBPW);
-        $this->DB->exec("set names utf8");
+        $this->db = new PDO($dbconnect, $dbuser, $dbpw);
+        $this->db->exec("set names utf8");
     
     }
-    function __destruct()
+    
+    public function __destruct()
     {
-        $this->DB = NULL;
+        $this->db = NULL;
     }
-    public function checkBalance($ACCOUNT)
-    {
-        $RESULT = $this->DB->prepare("SELECT * FROM `account` WHERE `account` = ? FOR UPDATE");
-        $RESULT->execute(array($ACCOUNT));//依序取代sql中"?"的值，並執行
+    
+    public function checkBalance($account)
+    {   
+        $result = $this->db->prepare("SELECT * FROM `account` WHERE `account` = ? FOR UPDATE");
+        $result->execute(array($account));//依序取代sql中"?"的值，並執行
     }
-    public function paymentFlow_insertEarn($ACCOUNT,$MONEY)
+    
+    public function paymentFlowInsertEarn($account,$money)
     {
-        $RESULT = $this->DB->prepare("INSERT INTO `payment_flow`(`money`,`account`) VALUES (?,?)");
-        $RESULT->execute(array($MONEY,$ACCOUNT));//依序取代sql中"?"的值，並執行
+        $datetime = date ("Y- m - d / H : i : s"); 
+        $result = $this->db->prepare("INSERT INTO `payment_flow`(`money`,`account`,`date`) VALUES (?,?,?)");
+        $result->execute(array($money,$account,$datetime));//依序取代sql中"?"的值，並執行
         return true;    
     }
-    public function paymentFlowEearnMoney($ACCOUNT,$MONEY)
+    
+    public function paymentFlowEearnMoney($account,$money)
     {   
-        $this->paymentFlow_insertEarn($ACCOUNT,$MONEY);
-        $RESULT = $this->DB->prepare("UPDATE `account` SET `balance`= `balance`+? WHERE `account` = ?");
-        $RESULT->execute(array($MONEY,$ACCOUNT));//依序取代sql中"?"的值，並執行
+        $this->paymentFlowInsertEarn($account,$money);
+        $result = $this->db->prepare("UPDATE `account` SET `balance`= `balance`+? WHERE `account` = ?");
+        $result->execute(array($money,$account));//依序取代sql中"?"的值，並執行
         return true;    
     }
-    public function paymentFlow_insertPay($ACCOUNT,$MONEY)
-    {   
-        $MONEY = "-".$MONEY;
-        $RESULT = $this->DB->prepare("INSERT INTO `payment_flow`(`money`,`account`) VALUES (?,?)");
-        $RESULT->execute(array($MONEY,$ACCOUNT));//依序取代sql中"?"的值，並執行
+    
+    public function paymentFlowInsertPay($account,$money)
+    {   $datetime = date ("Y- m - d / H : i : s"); 
+        $money = "-".$money;
+        $result = $this->db->prepare("INSERT INTO `payment_flow`(`money`,`account`,`date`) VALUES (?,?,?)");
+        $result->execute(array($money,$account,$datetime));//依序取代sql中"?"的值，並執行
         return true;    
     }
-    public function paymentFlowPayMoney($ACCOUNT,$MONEY)
+    
+    public function paymentFlowPayMoney($account,$money)
     {   
-        $this->paymentFlow_insertPay($ACCOUNT,$MONEY);
-        $RESULT = $this->DB->prepare("UPDATE `account` SET `balance`= `balance`-? WHERE `account` = ?");
-        $RESULT->execute(array($MONEY,$ACCOUNT));//依序取代sql中"?"的值，並執行
+        $this->paymentFlowInsertPay($account,$money);
+        $result = $this->db->prepare("UPDATE `account` SET `balance`= `balance`-? WHERE `account` = ?");
+        $result->execute(array($money,$account));//依序取代sql中"?"的值，並執行
         return true;    
     }
-    public function AccountBalance($ACCOUNT)
+    
+    public function accountBalance($account)
     {
-        $RESULT = $this->DB->prepare("SELECT * FROM `account` WHERE `account` = ?");
-        $RESULT->execute(array($ACCOUNT));//依序取代sql中"?"的值，並執行
-        return $RESULT; 
+        $result = $this->db->prepare("SELECT * FROM `account` WHERE `account` = ?");
+        $result->execute(array($account));//依序取代sql中"?"的值，並執行
+        return $result; 
     }
-    public function AccountShowPayMent($ACCOUNT)
+    
+    public function accountShowPayMent($account)
     {   
-        $RESULT = $this->DB->prepare("SELECT * FROM `payment_flow` WHERE `account` = ?");
-        $RESULT->execute(array($ACCOUNT));//依序取代sql中"?"的值，並執行
-        return $RESULT; 
+        $result = $this->db->prepare("SELECT * FROM `payment_flow` WHERE `account` = ?");
+        $result->execute(array($account));//依序取代sql中"?"的值，並執行
+        return $result; 
     }
 }
-?>

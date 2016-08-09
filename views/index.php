@@ -5,10 +5,10 @@
             function check()
             {   
                 $("#show_info").html("");
-                var ACCOUNT = $("#account").val();
-                if(ACCOUNT !=""){
+                var account = $("#account").val();
+                if(account !=""){
                     $("#show_info").html("<center><h3>帳號檢查中，請稍後...</h3></center>");
-                    $.get("/payment/PaymentFlow/ShowPayMent?account="+ACCOUNT,res)
+                    $.get("/payment/PaymentFlow/showPayMent?account="+account,res)
                 }else{
                     $("#show_info").html("<center><h3>請輸入銀行帳號</h3></center>");
                 }
