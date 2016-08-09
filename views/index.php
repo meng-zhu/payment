@@ -1,5 +1,25 @@
 <html>
     <head>
+        <script type="text/javascript" src="/payment/jquery.js"></script>
+        <script type="text/javascript">
+            function check()
+            {   
+                $("#show_info").html("");
+                var ACCOUNT = $("#account").val();
+                if(ACCOUNT !=""){
+                    $("#show_info").html("<center><h3>帳號檢查中，請稍後...</h3></center>");
+                    $.get("/payment/PaymentFlow/ShowPayMent?account="+ACCOUNT,res)
+                }else{
+                    $("#show_info").html("<center><h3>請輸入銀行帳號</h3></center>");
+                }
+                
+            }
+            function res(data)
+            {
+                    $("#show_info").html(data);
+            }
+        </script>
+        
         <meta charset="utf-8">
         <title>payment</title>
     </head>
@@ -16,7 +36,7 @@
             </tr>
             <tr>
                 <td COLSPAN=2><center>
-                    <button type="submit" class="btn btn-default" id="checkbtn">查詢餘額及明細</button>
+                    <button type="button" class="btn btn-default" id="checkbtn" onclick="check()">查詢餘額及明細</button>
                 </center></td>
             </tr>
             <tr>
@@ -35,5 +55,6 @@
             </tr>
             </form>
         </table>
+        <div id="show_info"></div>
     </body>
 </html>

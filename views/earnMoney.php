@@ -7,12 +7,12 @@
                 $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
                 var ACCOUNT = $("#account").val();
                 var MONEY = $("#money").val();
-                
-                $.get("../PaymentFlow/earnMoney?account="+ACCOUNT+"&money="+MONEY,res)
+                /* type: 1 = 出款 2 = 入款 */
+                $.get("../PaymentFlow/Money?type=2&account="+ACCOUNT+"&money="+MONEY,res)
             }
             function res(data)
             {
-                $("#show_info").html("<center><h3>"+data+"</h3></center>");
+                $("#show_info").html(data);
             }
         </script>
         <meta charset="utf-8">
