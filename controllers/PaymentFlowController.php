@@ -22,15 +22,18 @@ class PaymentFlowController extends Controller
             $showInfo = '金額不得為負數';
 
             $this->view('showinformation',$showInfo);
+
             return;
         }
 
         /* 先確認是否有此帳號 */
         $checkAccount = $this->checkAccount($account);
+
         if (!$checkAccount) {
             $showInfo = '帳號輸入錯誤';
 
             $this->view('showinformation',$showInfo);
+
             return;
         }
 

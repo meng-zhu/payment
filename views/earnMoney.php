@@ -9,18 +9,22 @@
                 var memo= $("#memo").val();
                 var type = "入款";
 
-                if(account != "" && money != ""){
-                    $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
-                    $.ajax({
-                        url: "../PaymentFlow/money/",
-                        data: "&type="+type+"&account="+account+"&money="+money+"&memo="+memo,
-                        type:"POST",
-                        dataType:'html',
-                        success: function(data){
-                            $("#show_info").html(data);
-                        }
-                    });
-                }else{
+                if (account != "" && money != "") {
+                    if (!isNaN(money)) {
+                        $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
+                        $.ajax({
+                            url: "../PaymentFlow/money/",
+                            data: "&type="+type+"&account="+account+"&money="+money+"&memo="+memo,
+                            type:"POST",
+                            dataType:'html',
+                            success: function(data){
+                                $("#show_info").html(data);
+                            }
+                        });
+                    } else {
+                        $("#show_info").html("<center><h3>金額只能輸入數字</h3><center>");
+                    }
+                } else {
                     $("#show_info").html("<center><h3>資料輸入不完全</h3><center>");
                 }
 

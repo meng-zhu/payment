@@ -11,6 +11,7 @@ class PaymentFlow
         $dbconnect = 'mysql:host=localhost;dbname=payment;port=3306';
         $dbuser = 'root';
         $dbpw = '';
+
         /* 連接資料庫伺服器 */
         $this->db = new PDO($dbconnect, $dbuser, $dbpw);
         $this->db->exec('set names utf8');
@@ -70,7 +71,8 @@ class PaymentFlow
 
     /* 新增出入帳紀錄 */
     public function insertList($account, $money, $memo, $type)
-    {   $datetime = date ('Y-m-d H:i:s');
+    {
+        $datetime = date ('Y-m-d H:i:s');
         $getBalance = $this->getBalance($account);
 
         /* 取得本次紀錄完成後的餘額 */

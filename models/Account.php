@@ -10,7 +10,8 @@ class Account
         $dbconnect = 'mysql:host=localhost;dbname=payment;port=3306';
         $dbuser = 'root';
         $dbpw = '';
-        // 連接資料庫伺服器
+
+        /* 連接資料庫伺服器 */
         $this->db = new PDO($dbconnect, $dbuser, $dbpw);
         $this->db->exec("set names utf8");
     }
@@ -32,6 +33,7 @@ class Account
         if (!count($row)) {
             return false;
         }
+
         return true;
     }
 }
