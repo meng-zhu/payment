@@ -18,14 +18,22 @@ class PaymentFlowController extends Controller
         $money = $_POST['money'];
         $memo = $_POST['memo'];
 
+        if ($money < 0) {
+            $showInfo = '金額不得為負數';
+
+            $this->view('showinformation',$showInfo);
+            return;
+        }
+
         /* 先確認是否有此帳號 */
         $checkAccount = $this->checkAccount($account);
         if (!$checkAccount) {
             $showInfo = '帳號輸入錯誤';
 
             $this->view('showinformation',$showInfo);
-            exit;
+            return;
         }
+
         try {
             $paymentFlow = $this->model('PaymentFlow');
             $paymentFlow->db->beginTransaction();
@@ -37,26 +45,30 @@ class PaymentFlowController extends Controller
             if ($type == '出款') {
                 $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
 
-                if ($result){
-                    $showInfo = '交易完成，已成功付出款項';
-                }else{
+                $showInfo = '交易完成，已成功付出款項';
+
+                if (!$result){
                     $showInfo = '交易失敗，帳戶餘額不足';
+
+                    throw new PDOException($showInfo);
                 }
-            } else {
+            }
+
+            if ($type == '入款') {
                 $result = $paymentFlow->deposit($account, $money, $memo, $type);
 
-                if ($result){
+                if ($result) {
                     $showInfo = '交易完成，已成功存入戶頭';
                 }
             }
+
             $paymentFlow->db->commit();
 
             $this->view('showinformation',$showInfo);
         } catch(PDOException $showInfo) {
             $paymentFlow->db->rollback();
-            $showInfo = '交易失敗，請在試一次';
 
-            $this->view('showinformation', $showInfo-＞getMessage());
+            $this->view('showinformation', $showInfo->getMessage());
         }
 
     }
@@ -73,7 +85,7 @@ class PaymentFlowController extends Controller
             $showInfo = '帳號輸入錯誤';
 
             $this->view('showinformation', $showInfo);
-            exit;
+            return;
         }
 
         $paymentFlow = $this->model('PaymentFlow');
