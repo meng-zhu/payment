@@ -4,8 +4,9 @@ class PaymentFlowController extends Controller
     /* 確認是否有此帳戶 */
     public function checkAccount($account)
     {
-        $check = $this->model("Account");
+        $check = $this->model('Account');
         $checkAccount = $check->checkAccount($account);
+
         return $checkAccount;
     }
 
@@ -16,51 +17,69 @@ class PaymentFlowController extends Controller
         $account = $_POST['account'];
         $money = $_POST['money'];
         $memo = $_POST['memo'];
+
         /* 先確認是否有此帳號 */
         $checkAccount = $this->checkAccount($account);
-        if ($checkAccount) {
-            try {
-                $paymentFlow = $this->model("PaymentFlow");
-                $paymentFlow->db->beginTransaction();
-                /* 執行 row lock */
-                $paymentFlow->checkBalance($account);
-                sleep(10);
-                /* type: 1 = 出款 ; 2 = 入款 */
-                if ($type == 1) {
-                    $result = $paymentFlow->payMoney($account, $money, $memo);
-                    if ($result)
-                        $showInfo = "交易完成，已成功付出款項";
-                } else {
-                    $result = $paymentFlow->earnMoney($account, $money, $memo);
-                    if ($result)
-                        $showInfo = "交易完成，已成功存入戶頭";
-                }
-                $paymentFlow->db->commit();
-            } catch(PDOException $showInfo) {
-                $paymentFlow->db->rollback();
-                $showInfo = "交易失敗，請在試一次";
-                $this->view("showinformation", $showInfo-＞getMessage());
-            }
-        } else {
-            $showInfo = "帳號輸入錯誤";
+        if (!$checkAccount) {
+            $showInfo = '帳號輸入錯誤';
+
+            $this->view('showinformation',$showInfo);
+            exit;
         }
-        $this->view("showinformation",$showInfo);
+        try {
+            $paymentFlow = $this->model('PaymentFlow');
+            $paymentFlow->db->beginTransaction();
+
+            /* 執行 row lock */
+            $paymentFlow->checkBalance($account);
+
+            /* type: 出款/入款 */
+            if ($type == '出款') {
+                $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
+
+                if ($result){
+                    $showInfo = '交易完成，已成功付出款項';
+                }else{
+                    $showInfo = '交易失敗，帳戶餘額不足';
+                }
+            } else {
+                $result = $paymentFlow->deposit($account, $money, $memo, $type);
+
+                if ($result){
+                    $showInfo = '交易完成，已成功存入戶頭';
+                }
+            }
+            $paymentFlow->db->commit();
+
+            $this->view('showinformation',$showInfo);
+        } catch(PDOException $showInfo) {
+            $paymentFlow->db->rollback();
+            $showInfo = '交易失敗，請在試一次';
+
+            $this->view('showinformation', $showInfo-＞getMessage());
+        }
+
     }
 
     /* 查看帳戶餘額及明細 */
-    public function showPayMent()
+    public function showPayment()
     {
         $account = $_POST['account'];
+
         /* 先確認是否有此帳號 */
         $checkAccount = $this->checkAccount($account);
-        if ($checkAccount) {
-            $paymentFlow = $this->model("PaymentFlow");
-            $resultBalance = $paymentFlow->accountBalance($account);
-            $resultAll = $paymentFlow->accountShowPayMent($account);
-            $this->view("balance", $resultBalance, $resultAll);
-        } else {
-            $showInfo = "帳號輸入錯誤";
-            $this->view("showinformation", $showInfo);
+
+        if (!$checkAccount) {
+            $showInfo = '帳號輸入錯誤';
+
+            $this->view('showinformation', $showInfo);
+            exit;
         }
+
+        $paymentFlow = $this->model('PaymentFlow');
+        $resultBalance = $paymentFlow->getBalance($account);
+        $resultList = $paymentFlow->getList($account);
+
+        $this->view('balance', $resultBalance, $resultList);
     }
 }

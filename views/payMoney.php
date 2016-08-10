@@ -8,8 +8,8 @@
                 var account = $("#account").val();
                 var money = $("#money").val();
                 var memo= $("#memo").val();
-                var type = "1";
-                /* type: 1 = 出款 2 = 入款 */
+                var type = "出款";
+
                 if(account != "" && money != ""){
                     $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
                     $.ajax({

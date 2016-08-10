@@ -9,7 +9,7 @@
                 if(account != ""){
                     $("#show_info").html("<center><h3>帳號檢查中，請稍後...</h3></center>");
                     $.ajax({
-                        url: "PaymentFlow/showPayMent/",
+                        url: "PaymentFlow/showPayment/",
                         data: "&account="+account,
                         type:"POST",
                         dataType:'html',
