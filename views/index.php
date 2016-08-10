@@ -3,23 +3,26 @@
         <script type="text/javascript" src="/payment/jquery.js"></script>
         <script type="text/javascript">
             function check()
-            {   
+            {
                 $("#show_info").html("");
                 var account = $("#account").val();
-                if(account !=""){
+                if(account != ""){
                     $("#show_info").html("<center><h3>帳號檢查中，請稍後...</h3></center>");
-                    $.get("/payment/PaymentFlow/showPayMent?account="+account,res)
+                    $.ajax({
+                        url: "PaymentFlow/showPayMent/",
+                        data: "&account="+account,
+                        type:"POST",
+                        dataType:'html',
+                        success: function(data){
+                            $("#show_info").html(data);
+                        }
+                    });
                 }else{
-                    $("#show_info").html("<center><h3>請輸入銀行帳號</h3></center>");
+                    $("#show_info").html("<center><h3>請輸入銀行帳號</h3><center>");
                 }
-                
-            }
-            function res(data)
-            {
-                    $("#show_info").html(data);
             }
         </script>
-        
+
         <meta charset="utf-8">
         <title>payment</title>
     </head>

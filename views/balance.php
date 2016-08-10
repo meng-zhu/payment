@@ -29,32 +29,38 @@
         <center><h1>帳目明細</h1><center>
             <table  style="border:3px #FFAC55 dashed;padding:5px;" rules="all" cellpadding='5' align="center";>
                 <tr>
-                    <td COLSPAN=2><center>
+                    <td COLSPAN=3><center>
                         交易紀錄
                     </center></td>
                 </tr>
                 <tr>
                     <td><center>
+                        交易日期
+                    </center></td>
+                    <td><center>
                         交易金額
                     </center></td>
                     <td><center>
-                        交易日期
+                        備註說明
                     </center></td>
                 </tr>
                 <?php   foreach($data2 as $key2)
                         { ?>
                 <tr>
                     <td Style="text-align:right" >
+                        <?php echo $key2['date']; ?>
+                    </td>
+                    <td Style="text-align:right" >
                         <?php echo $key2['money']; ?>
                     </td>
                     <td Style="text-align:right" >
-                        <?php echo $key2['date']; ?>
+                        <?php echo $key2['memo']; ?>
                     </td>
                 </tr>
-                <?php   } ?> 
-                
+                <?php   } ?>
+
             </table>
-          
+
     </body>
 </html>
 

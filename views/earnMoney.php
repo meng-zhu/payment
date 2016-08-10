@@ -4,15 +4,26 @@
         <script type="text/javascript">
             function check()
             {
-                $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
                 var account = $("#account").val();
                 var money = $("#money").val();
+                var memo= $("#memo").val();
+                var type = "2";
                 /* type: 1 = 出款 2 = 入款 */
-                $.get("../PaymentFlow/money?type=2&account="+account+"&money="+money,res)
-            }
-            function res(data)
-            {
-                $("#show_info").html(data);
+                if(account != "" && money != ""){
+                    $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
+                    $.ajax({
+                        url: "../PaymentFlow/money/",
+                        data: "&type="+type+"&account="+account+"&money="+money+"&memo="+memo,
+                        type:"POST",
+                        dataType:'html',
+                        success: function(data){
+                            $("#show_info").html(data);
+                        }
+                    });
+                }else{
+                    $("#show_info").html("<center><h3>資料輸入不完全</h3><center>");
+                }
+
             }
         </script>
         <meta charset="utf-8">
@@ -20,7 +31,7 @@
     </head>
     <body>
         <table  style="border:3px #FFAC55 dashed;padding:5px;" rules="all" cellpadding='5' align="center";>
-        <form role="form"  action="../PaymentFlowController/earnMoney" method="post" enctype="multipart/form-data">
+        <form>
             <tr>
                 <td COLSPAN=2><center>
                     <label>入款</label>
@@ -28,7 +39,7 @@
             </tr>
             <tr>
                 <td>
-                    <label>帳號:</label>    
+                    <label>帳號:</label>
                 </td>
                 <td>
                     <input class="form-control" placeholder="銀行帳號" id="account" name="account">
@@ -40,6 +51,14 @@
                 </td>
                 <td>
                     <input class="form-control" placeholder="請填寫入款金額" id="money" name="money" pattern="[0-9]{0,5}">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>備註說明：</label>
+                </td>
+                <td>
+                    <textarea placeholder="請輸入備註說明" id="memo" name="memo"></textarea>
                 </td>
             </tr>
             <tr>
