@@ -102,7 +102,9 @@ class PaymentFlowController extends Controller
         $paymentFlow = $this->model('PaymentFlow');
         $resultBalance = $paymentFlow->getBalance($account);
         $resultList = $paymentFlow->getList($account);
-
-        $this->view('balance', $resultBalance, $resultList);
+        $resultAll = array($resultBalance,$resultList);
+        // print_r ($resultAll);
+        // $this->view('showinformation', $showInfo);
+        $this->view('balance', $resultAll);
     }
 }

@@ -6,14 +6,12 @@
     <body>
         <center><h1>銀行餘額</h1><center>
             <table  style="border:3px #FFAC55 dashed;padding:5px;" rules="all" cellpadding='5' align="center";>
-                <?php   foreach($data as $key)
-                        {                    ?>
                 <tr>
                     <td><cneter>
                         帳號
                     </cneter></td>
                     <td><center>
-                        <?php echo $key['account'];?>
+                        <?php echo $data[0][0]['account'];?>
                     </center></td>
                 </tr>
                 <tr>
@@ -21,7 +19,7 @@
                         餘額
                     </center></td>
                     <td><center>
-                        <?php echo $key['balance'];}?>
+                        <?php echo $data[0][0]['balance'];?>
                     </center></td>
                 </tr>
             </table>
@@ -51,27 +49,27 @@
                     </center></td>
 
                 </tr>
-                <?php   foreach($data2 as $key2)
-                        { ?>
+                <?php foreach($data[1] as $key)
+                    {
+                ?>
                 <tr>
                     <td Style="text-align:right" >
-                        <?php echo $key2['date']; ?>
+                        <?php echo $key['date']; ?>
                     </td>
                     <td Style="text-align:right" >
-                        <?php echo $key2['memo']; ?>
+                        <?php echo $key['memo']; ?>
                     </td>
                     <td Style="text-align:right" >
-                        <?php echo $key2['type']; ?>
+                        <?php echo $key['type']; ?>
                     </td>
                     <td Style="text-align:right" >
-                        <?php echo $key2['money']; ?>
+                        <?php echo $key['money']; ?>
                     </td>
                     <td Style="text-align:right" >
-                        <?php echo $key2['balance']; ?>
+                        <?php echo $key['balance']; ?>
                     </td>
                 </tr>
-                <?php   } ?>
-
+                <?php } ?>
             </table>
 
     </body>
