@@ -13,7 +13,7 @@
                     if (!isNaN(money)) {
                         $("#show_info").html("<center><h3>交易進行中，請稍後...</h3></center>");
                         $.ajax({
-                            url: "../PaymentFlow/money/",
+                            url: "../PaymentFlow/withdrawalAndDeposit/",
                             data: "&type="+type+"&account="+account+"&money="+money+"&memo="+memo,
                             type:"POST",
                             dataType:'html',

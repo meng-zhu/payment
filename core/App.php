@@ -1,14 +1,16 @@
 <?php
+
 class App
 {
-    /* 將網址拆解的結果進行加工並確實導向controller中的function執行 */
+    /**
+     * 將網址拆解的結果進行加工並確實導向controller中的function執行
+     */
     public function __construct()
     {
          $url = $this->parseUrl();
 
          $controllerName = "{$url[0]}Controller";
 
-         /* 沒有打 controller名稱 或 打成沒有的controller名稱 皆跳轉 index.php頁面(主頁) */
          if (!file_exists("controllers/$controllerName.php")) {
              header("location:https://missing-meng-zhu.c9users.io/payment/Home");
          }
@@ -22,11 +24,13 @@ class App
          }
 
          unset($url[0]); unset($url[1]);
-         $params = $url ? array_values($url) : Array();
-         call_user_func_array(Array($controller, $methodName), $params);
+         $params = $url ? array_values($url) : array();
+         call_user_func_array(array($controller, $methodName), $params);
     }
 
-    /* 將網址進行拆解 */
+    /**
+     * 將網址進行拆解
+     */
     public function parseUrl()
     {
         if (isset($_GET["url"])) {
