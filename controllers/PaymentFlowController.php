@@ -88,6 +88,7 @@ class PaymentFlowController extends Controller
             $showInfo = '帳號輸入錯誤';
 
             $this->view('showinformation', $showInfo);
+
             return;
         }
 
