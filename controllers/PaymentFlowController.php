@@ -42,40 +42,42 @@ class PaymentFlowController extends Controller
             return;
         }
 
-        try {
-            $paymentFlow = $this->model('PaymentFlow');
-            $paymentFlow->db->beginTransaction();
+        $paymentFlow = $this->model('PaymentFlow');
 
-            // type: 出款/入款
-            if ($type == '出款') {
-                $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
+        // type: 出款/入款
+        if ($type == '出款') {
+            $showInfo = '交易完成，已成功付出款項';
 
-                $showInfo = '交易完成，已成功付出款項';
+            $getBalance = $paymentFlow->getBalance($account);
 
-                if (!$result){
-                    $showInfo = '交易失敗，帳戶餘額不足';
+            // 取得餘額以確保可以正確提款
+            $balance = $getBalance[0]['balance'];
 
-                    throw new PDOException($showInfo);
-                }
+            $check = $balance - $money;
+            if($check < 0 ){
+                $showInfo = '交易失敗，帳戶餘額不足';
             }
+            // echo $balance;
 
-            if ($type == '入款') {
-                $result = $paymentFlow->deposit($account, $money, $memo, $type);
+            $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
 
-                if ($result) {
-                    $showInfo = '交易完成，已成功存入戶頭';
-                }
+            if (!$result){
+                $showInfo = '交易失敗，請在試一次';
             }
-
-            $paymentFlow->db->commit();
-
-            $this->view('showinformation', $showInfo);
-        } catch(PDOException $showInfo) {
-            $paymentFlow->db->rollback();
-
-            $this->view('showinformation', $showInfo->getMessage());
         }
 
+        if ($type == '入款') {
+            $result = $paymentFlow->deposit($account, $money, $memo, $type);
+
+            $showInfo = '交易完成，已成功存入戶頭';
+
+            if (!$result) {
+                $showInfo = '交易失敗，請在試一次';
+            }
+
+        }
+
+        $this->view('showinformation', $showInfo);
     }
 
     /**

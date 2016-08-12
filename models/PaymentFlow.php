@@ -37,13 +37,22 @@ class PaymentFlow
     public function deposit($account, $money, $memo, $type)
     {
         $getBalance = $this->getBalance($account);
-        sleep(5);
 
-        $sql = 'UPDATE `account` SET `balance` = `balance` + :money WHERE `account` = :account';
+        $version = $getBalance[0]['version'];
+
+        $sql = 'UPDATE `account` SET `balance` = `balance` + :money, `version` = `version` + 1 WHERE `account` = :account AND `version` = :version';
         $result = $this->db->prepare($sql);
         $result->bindParam('money', $money);
         $result->bindParam('account', $account);
-        $result->execute();
+        $result->bindParam('version', $version);
+
+        // 執行並取得影響行數
+        $count = $result->rowCount($result->execute());
+
+        if(!$count){
+            return false;
+        }
+
         $this->insertList($account, $money, $memo, $type);
 
         return $result;
@@ -56,20 +65,21 @@ class PaymentFlow
     {
         $getBalance = $this->getBalance($account);
 
-        // 取得餘額以確保可以正確提款
-        $balance = $getBalance[0]['balance'];
+        $version = $getBalance[0]['version'];
 
-        $check = $balance - $money;
-        if($check < 0 ){
-            return false;
-        }
-        sleep(5);
-
-        $sql = 'UPDATE `account` SET `balance` = `balance` - :money WHERE `account` = :account';
+        $sql = 'UPDATE `account` SET `balance` = `balance` - :money, `version` = `version` + 1  WHERE `account` = :account AND `version` = :version';
         $result = $this->db->prepare($sql);
         $result->bindParam('money', $money);
         $result->bindParam('account', $account);
-        $result->execute();
+        $result->bindParam('version', $version);
+
+         // 執行並取得影響行數
+        $count = $result->rowCount($result->execute());
+
+        if(!$count){
+            return false;
+        }
+
         $this->insertList($account, $money, $memo, $type);
 
         return $result;
@@ -106,7 +116,7 @@ class PaymentFlow
      */
     public function getBalance($account)
     {
-        $sql = 'SELECT * FROM `account` WHERE `account` = :account LOCK IN SHARE MODE';
+        $sql = 'SELECT * FROM `account` WHERE `account` = :account';
         $result = $this->db->prepare($sql);
         $result->bindParam('account', $account);
         $result->execute();
