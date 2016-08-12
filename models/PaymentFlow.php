@@ -46,16 +46,15 @@ class PaymentFlow
         $result->bindParam('account', $account);
         $result->bindParam('version', $version);
 
-        // 執行並取得影響行數
-        $count = $result->rowCount($result->execute());
+        $result->execute();
 
-        if(!$count){
+        if(!$result->rowCount()){
             return false;
         }
 
         $this->insertList($account, $money, $memo, $type);
 
-        return $result;
+        return true;
     }
 
     /**
@@ -73,16 +72,15 @@ class PaymentFlow
         $result->bindParam('account', $account);
         $result->bindParam('version', $version);
 
-         // 執行並取得影響行數
-        $count = $result->rowCount($result->execute());
+        $result->execute();
 
-        if(!$count){
+        if(!$result->rowCount()){
             return false;
         }
 
         $this->insertList($account, $money, $memo, $type);
 
-        return $result;
+        return true;
     }
 
     /**
