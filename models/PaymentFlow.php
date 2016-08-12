@@ -26,19 +26,9 @@ class PaymentFlow
      */
     public function __destruct()
     {
-        $this->db = NULL;
+        $this->db = null;
 
         echo "<script>console.log('關閉資料庫連線--".date('h:i:s')."');</script>";
-    }
-
-    /**
-     * 執行low lock
-     */
-    public function lockBalance($account)
-    {
-        $result = $this->db->prepare('SELECT * FROM `account` WHERE `account` = :account FOR UPDATE');
-        $result->bindParam('account', $account);
-        $result->execute();
     }
 
     /**
@@ -46,7 +36,11 @@ class PaymentFlow
      */
     public function deposit($account, $money, $memo, $type)
     {
-        $result = $this->db->prepare('UPDATE `account` SET `balance` = `balance` + :money WHERE `account` = :account');
+        $getBalance = $this->getBalance($account);
+        sleep(5);
+
+        $sql = 'UPDATE `account` SET `balance` = `balance` + :money WHERE `account` = :account';
+        $result = $this->db->prepare($sql);
         $result->bindParam('money', $money);
         $result->bindParam('account', $account);
         $result->execute();
@@ -69,8 +63,10 @@ class PaymentFlow
         if($check < 0 ){
             return false;
         }
+        sleep(5);
 
-        $result = $this->db->prepare('UPDATE `account` SET `balance` = `balance` - :money WHERE `account` = :account');
+        $sql = 'UPDATE `account` SET `balance` = `balance` - :money WHERE `account` = :account';
+        $result = $this->db->prepare($sql);
         $result->bindParam('money', $money);
         $result->bindParam('account', $account);
         $result->execute();
@@ -90,7 +86,10 @@ class PaymentFlow
         // 取得本次紀錄完成後的餘額
         $balance = $getBalance[0]['balance'];
 
-        $result = $this->db->prepare('INSERT INTO `payment_flow`(`money`, `account`, `date`, `memo`, `type`, `balance`) VALUES (:money, :account, :date, :memo, :type, :balance)');
+        $sql = 'INSERT INTO `payment_flow`
+            (`money`, `account`, `date`, `memo`, `type`, `balance`) VALUES
+            (:money, :account, :date, :memo, :type, :balance)';
+        $result = $this->db->prepare($sql);
         $result->bindParam('money', $money);
         $result->bindParam('account', $account);
         $result->bindParam('date', $datetime);
@@ -107,9 +106,11 @@ class PaymentFlow
      */
     public function getBalance($account)
     {
-        $result = $this->db->prepare('SELECT * FROM `account` WHERE `account` = :account');
+        $sql = 'SELECT * FROM `account` WHERE `account` = :account LOCK IN SHARE MODE';
+        $result = $this->db->prepare($sql);
         $result->bindParam('account', $account);
         $result->execute();
+
         $result = $result->fetchAll();
 
         return $result;
@@ -120,7 +121,8 @@ class PaymentFlow
      */
     public function getList($account)
     {
-        $result = $this->db->prepare('SELECT * FROM `payment_flow` WHERE `account` = :account ORDER BY `date` ASC');
+        $sql = 'SELECT * FROM `payment_flow` WHERE `account` = :account ORDER BY `date` ASC';
+        $result = $this->db->prepare($sql);
         $result->bindParam('account', $account);
         $result->execute();
         $result = $result->fetchAll();

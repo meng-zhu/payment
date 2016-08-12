@@ -46,9 +46,6 @@ class PaymentFlowController extends Controller
             $paymentFlow = $this->model('PaymentFlow');
             $paymentFlow->db->beginTransaction();
 
-            // 執行 row lock
-            $paymentFlow->lockBalance($account);
-
             // type: 出款/入款
             if ($type == '出款') {
                 $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
@@ -103,8 +100,7 @@ class PaymentFlowController extends Controller
         $resultBalance = $paymentFlow->getBalance($account);
         $resultList = $paymentFlow->getList($account);
         $resultAll = array($resultBalance,$resultList);
-        // print_r ($resultAll);
-        // $this->view('showinformation', $showInfo);
+
         $this->view('balance', $resultAll);
     }
 }

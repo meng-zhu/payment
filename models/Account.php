@@ -31,7 +31,8 @@ class Account
      */
     public function checkAccount($account)
     {
-        $result = $this->db->prepare('SELECT * FROM `account` WHERE `account` = :account');
+        $sql = 'SELECT * FROM `account` WHERE `account` = :account';
+        $result = $this->db->prepare($sql);
         $result->bindParam('account', $account);
         $result->execute();
         $row = $result->fetchAll();
