@@ -56,8 +56,11 @@ class PaymentFlowController extends Controller
             $check = $balance - $money;
             if($check < 0 ){
                 $showInfo = '交易失敗，帳戶餘額不足';
+
+                $this->view('showinformation', $showInfo);
+
+                return;
             }
-            // echo $balance;
 
             $result = $paymentFlow->withdrawal($account, $money, $memo, $type);
 
